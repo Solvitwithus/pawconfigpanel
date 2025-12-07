@@ -59,7 +59,7 @@ export async function GET() {
   try {
     const data = await prisma.kennel.findMany({
       orderBy: { name: "asc" }, // must specify a field
-      where:{id:true,name:true}
+      select:{id:true,name:true}
     });
 
     return NextResponse.json(
