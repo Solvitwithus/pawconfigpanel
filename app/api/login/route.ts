@@ -2,6 +2,23 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
+// -------------------
+// CORS HEADERS
+// -------------------
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+// Handle preflight
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
+
+// -------------------
+// LOGIN POST ROUTE
+// -------------------
 export async function POST(req: NextRequest) {
   try {
     const form = await req.formData();
@@ -14,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!companyName || !companyPassword || !userName || !userPassword) {
       return NextResponse.json(
         { status: "ERROR", message: "Missing login fields" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -26,7 +43,7 @@ export async function POST(req: NextRequest) {
     if (!company) {
       return NextResponse.json(
         { status: "ERROR", message: "Company not found" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
@@ -39,7 +56,7 @@ export async function POST(req: NextRequest) {
     if (!companyPassOk) {
       return NextResponse.json(
         { status: "ERROR", message: "Invalid company password" },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -54,7 +71,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { status: "ERROR", message: "User not found in this company" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
@@ -67,7 +84,7 @@ export async function POST(req: NextRequest) {
     if (!userPassOk) {
       return NextResponse.json(
         { status: "ERROR", message: "Invalid user password" },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -79,13 +96,13 @@ export async function POST(req: NextRequest) {
         company,
         user,
       },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
       { status: "ERROR", message: "Failed to log in" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
