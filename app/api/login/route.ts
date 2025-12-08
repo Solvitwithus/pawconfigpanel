@@ -55,10 +55,9 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. CHECK COMPANY PASSWORD  (Ensure your model has "password")
-    const companyPassOk = await bcrypt.compare(
-      companyPassword,
-      (company as any).password
-    );
+  
+    
+    const companyPassOk = await bcrypt.compare(companyPassword, company.password);
 
     if (!companyPassOk) {
       return NextResponse.json(
@@ -88,10 +87,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. CHECK USER PASSWORD  (Ensure your model has "password")
-    const userPassOk = await bcrypt.compare(
-      userPassword,
-      (user as any).password
-    );
+const userPassOk = await bcrypt.compare(userPassword, user.password);
 
     if (!userPassOk) {
       return NextResponse.json(
