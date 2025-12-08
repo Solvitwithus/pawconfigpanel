@@ -57,3 +57,9 @@ export async function POST(req: NextRequest) {
     await prisma.$disconnect();
   }
 }
+
+
+
+export async function GET(){
+  const data = await prisma.users.findMany({include:{kennel:true}})
+}
