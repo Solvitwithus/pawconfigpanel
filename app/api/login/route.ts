@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // -------------------
 // CORS HEADERS
@@ -11,7 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-// Handle preflight
+// Handle preflight requests
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. FIND COMPANY (KENNEL)
+    // 1. FIND COMPANY
     const company = await prisma.kennel.findUnique({
       where: { name: companyName },
     });
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. CHECK COMPANY PASSWORD
+    // 2. CHECK COMPANY PASSWORD  (Ensure your model has "password")
     const companyPassOk = await bcrypt.compare(
       companyPassword,
       (company as any).password
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. CHECK USER PASSWORD
+    // 4. CHECK USER PASSWORD  (Ensure your model has "password")
     const userPassOk = await bcrypt.compare(
       userPassword,
       (user as any).password
@@ -88,6 +89,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // -------------------
+    // 5. GENERATE JWT TOKEN
+    // -------------------
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        cp: company.cp,
+       
+        
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: "7d" }
+    );
+
     // SUCCESS
     return NextResponse.json(
       {
@@ -95,13 +110,15 @@ export async function POST(req: NextRequest) {
         message: "Login successful",
         company,
         user,
+        token,
       },
       { status: 200, headers: corsHeaders }
     );
+
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { status: "ERROR", message: "Failed to log in" },
+      { status: "ERROR", message: "Failed to log in", error },
       { status: 500, headers: corsHeaders }
     );
   }
