@@ -108,7 +108,7 @@ const userPassOk = await bcrypt.compare(userPassword, user.password);
        
         
       },
-      process.env.JWT_SECRET!,
+      process.env.JWT_SECRET||"pass",
       { expiresIn: "7d" }
     );
 
