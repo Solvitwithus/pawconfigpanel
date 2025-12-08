@@ -22,6 +22,8 @@ export async function OPTIONS() {
 // -------------------
 export async function POST(req: NextRequest) {
   try {
+    console.log("Hi man");
+    
     const form = await req.formData();
 
     const companyName = form.get("companyName")?.toString() || "";
@@ -123,10 +125,11 @@ const userPassOk = await bcrypt.compare(userPassword, user.password);
     );
 
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { status: "ERROR", message: "Failed to log in", error },
-      { status: 500, headers: corsHeaders }
-    );
-  }
+  console.error("Full login error:", error);
+  return NextResponse.json(
+    { status: "ERROR", message: "Failed to log in", error: String(error) },
+    { status: 500, headers: corsHeaders }
+  );
+}
+
 }
