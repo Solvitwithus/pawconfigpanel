@@ -36,10 +36,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. FIND COMPANY
+  
+
     const company = await prisma.kennel.findUnique({
-      where: { name: companyName },
-    });
+  where: { name: companyName },
+  select: {
+    id: true,
+    cp: true,
+    password: true,    // ← THIS IS REQUIRED
+  },
+});
 
     if (!company) {
       return NextResponse.json(
@@ -61,13 +67,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. FIND USER INSIDE THAT COMPANY
+   
+
     const user = await prisma.users.findFirst({
-      where: {
-        name: userName,
-        kennelId: company.id,
-      },
-    });
+  where: {
+    name: userName,
+    kennelId: company.id,
+  },
+  select: {
+    id: true,
+    password: true,    // ← THIS IS REQUIRED
+  },
+});
 
     if (!user) {
       return NextResponse.json(
